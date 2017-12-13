@@ -1,10 +1,12 @@
 package com.example.tablelayouttest;
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by hyt on 2017/12/1.
  */
 
-public class Course {
+public class Course extends DataSupport{
     private int day;
     private int clsNum;
     private int clsCont;

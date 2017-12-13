@@ -27,5 +27,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.zhy:okhttputils:2.0.0'
     compile 'org.jsoup:jsoup:1.9.2'
+    compile 'org.litepal.android:core:1.4.1'
     testCompile 'junit:junit:4.12'
 }

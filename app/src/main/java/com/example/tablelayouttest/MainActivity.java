@@ -22,6 +22,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+    List<Course> courses = new ArrayList<>();
+
     private String strId = "151080123";
     private String strPassword = "669498";
     private String strViewstate = "dDwyODE2NTM0OTg7Oz7b4TfPH9kfTwPvgA6wFjRDk2mkHg==";
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private String lblanguage = "";
     private String txtsecretcode = "";
 
-    private static final String[]GRID_TITLE = {"9月","星期一","星期二","星期三","星期四","星期五","星期六","星期日"};
+    private static final String[]GRID_TITLE = {"10月","星期一","星期二","星期三","星期四","星期五","星期六","星期日"};
     private GridLayout mGridLayout;
     private int mGridMinWidth;
 
@@ -51,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //建库
+        LitePal.getDatabase();
+        //获取数据
+        courses = DataSupport.findAll(Course.class);
+
         mGridLayout = (GridLayout) findViewById(R.id.main_gridlayout);
         //初始化表格的最小宽度
         mGridMinWidth = getStreenWidth()/15;
@@ -58,7 +67,11 @@ public class MainActivity extends AppCompatActivity {
         setUpCourseScheduleTitle();
         setUpCourseScheduleNum();
         //获取课表
-        getScheduleFromWeb();
+        if (courses.size() > 0){
+            showSche(courses);
+        }else{
+            getScheduleFromWeb();
+        }
     }
     //设置首行
     @TargetApi(16)
@@ -208,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
     }
     //解析课表的html
     private void parseStringHtml(String html){
-        final List<Course> courses = new ArrayList<>();
         String tdStr;
         Document document = Jsoup.parse(html);
         Element elementTable1 = document.getElementById("Table1");
@@ -242,13 +254,12 @@ public class MainActivity extends AppCompatActivity {
                     else{
                         course.setClsCont(1);
                     }
-
+                    course.save();
                     courses.add(course);
                 }
             }
         }
-//        List<Course> coursess = new ArrayList<Course>();
-//        coursess = courses;
+        //切换线程
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
