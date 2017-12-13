@@ -3,6 +3,7 @@ package com.example.tablelayouttest;
 import android.annotation.TargetApi;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaCodec;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -33,9 +34,10 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     List<Course> courses = new ArrayList<>();
-
-    private String strId = "151080123";
-    private String strPassword = "669498";
+//    private String strId = "151080123";
+//    private String strPassword = "669498";
+    private String strId = "";
+    private String strPassword = "";
     private String strViewstate = "dDwyODE2NTM0OTg7Oz7b4TfPH9kfTwPvgA6wFjRDk2mkHg==";
     private String strViewTor = "92719903";
     private String  strRbtList = "%D1%A7%C9%FA";
@@ -55,9 +57,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //接收学号姓名
+        Intent intent = getIntent();
+        strId = intent.getStringExtra("account");
+        strPassword = intent.getStringExtra("password");
+
         //建库
         LitePal.getDatabase();
-        //获取数据
+        //获取数据库中所有数据
         courses = DataSupport.findAll(Course.class);
 
         mGridLayout = (GridLayout) findViewById(R.id.main_gridlayout);
