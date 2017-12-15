@@ -4,12 +4,23 @@ import android.annotation.TargetApi;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.MediaCodec;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -29,10 +40,13 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+
+    private DrawerLayout mDrawerlayout;
     List<Course> courses = new ArrayList<>();
 //    private String strId = "151080123";
 //    private String strPassword = "669498";
@@ -57,6 +71,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //设置toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //设置按键弹出滑动菜单
+        mDrawerlayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final NavigationView naView = (NavigationView) findViewById(R.id.nav_view);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            //将原有的home隐藏并将menu图片设置为home图标
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
+        //设置nav的点击逻辑
+        naView.setCheckedItem(R.id.nav_Schedule);//默认点击课表按钮
+        naView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_account:
+                        Intent intent = new Intent(MainActivity.this,LoginSquare.class);
+                        startActivity(intent);
+                        break;
+                }
+                mDrawerlayout.closeDrawers();
+                return true;
+            }
+        });
+
         //接收学号姓名
         Intent intent = getIntent();
         strId = intent.getStringExtra("account");
@@ -80,6 +122,19 @@ public class MainActivity extends AppCompatActivity {
             getScheduleFromWeb();
         }
     }
+
+    //监听导航栏点击对象
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                mDrawerlayout.openDrawer(GravityCompat.START);
+                break;
+            default:
+        }
+        return true;
+    }
+
     //设置首行
     @TargetApi(16)
     private void setUpCourseScheduleTitle(){
@@ -101,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
             tvTitle.setText(title);
             tvTitle.setGravity(Gravity.CENTER);
             tvTitle.setTextColor(getResources().getColor(android.R.color.background_dark));
+            tvTitle.setBackgroundColor(getResources().getColor(R.color.white));
             tvTitle.setBackground(getResources().getDrawable(R.drawable.shape));
             //动态添加进Gridtable
             mGridLayout.addView(tvTitle,params);
@@ -294,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
     //显示表
     @TargetApi(16)
     private void showSche(List<Course> Courses){
+        GradientDrawable drawable = (GradientDrawable) getResources().getDrawable(R.drawable.shape);
         for (int i = 0; i < Courses.size(); i++){
             Course course = Courses.get(i);
             int row = course.getClsNum();
@@ -307,12 +364,20 @@ public class MainActivity extends AppCompatActivity {
             //设置宽高
             params.width = mGridMinWidth*2;
             params.height = (int) getResources().getDimension(R.dimen.course_schedule_height);
+            //填满空格
             params.setGravity(Gravity.FILL);
+            //设置颜色
+            int[] customizedColors = getResources().getIntArray(R.array.customizedColors);
+            int customizedColor = customizedColors[new Random().nextInt(customizedColors.length)];
 
             TextView textView = new TextView(this);
-            textView.setBackground(getResources().getDrawable(R.drawable.shape));
+
             textView.setTextColor(getResources().getColor(android.R.color.background_dark));
+
             textView.setText(course.getClsName());
+            //此处有逻辑错误
+            textView.setBackground(getResources().getDrawable(R.drawable.curve));
+            textView.setBackgroundColor(customizedColor);
 //            textView.setGravity(Gravity.CENTER);
             mGridLayout.addView(textView,params);
         }
